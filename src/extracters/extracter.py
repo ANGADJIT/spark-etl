@@ -6,12 +6,12 @@ from ..utils import singleton_wrapper
 @singleton_wrapper.singleton
 class Extracter:
 
-    def __init__(self) -> None: # connect to database [MONGO-DB,POSTGRES] conatiner
+    def __init__(self) -> None: # connect to database [MONGO-DB,POSTGRES] container
         
         # connect to mongo db
         MONGO_URI:str = 'mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true' 
 
-        self.__adaniports_collection = MongoClient(MONGO_URI).stocks.adaniports
+        self.__stocks_db = MongoClient(MONGO_URI).stocks
 
         # connect to postgres
         conn = psycopg2.connect(
@@ -20,13 +20,11 @@ class Extracter:
 
         self.__axisbank = conn.cursor()
 
-    
-if __name__ == '__main__':
-    Extracter()
 
-    
+    def get_adaniports_mongo_db(self) -> list[dict]:
+        return list(self.__stocks_db.adaniports.find({},{'_id': 0}))
 
+    def get_axisbank_postgres_db(self) -> list[tuple]:
+        self.__axisbank.execute('SELECT * FROM AXISBANK')
 
-
-
-
+        return [ dict(line) for line in [zip([ column[0] for column in self.__axisbank.description if column[0] != 'index'], row) for row in self.__axisbank.fetchall()] ]
