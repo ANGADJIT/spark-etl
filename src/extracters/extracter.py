@@ -1,9 +1,6 @@
 from pymongo import MongoClient
 import psycopg2
 
-from ..utils import singleton_wrapper 
-
-@singleton_wrapper.singleton
 class Extracter:
 
     def __init__(self) -> None: # connect to database [MONGO-DB,POSTGRES] container
@@ -27,4 +24,5 @@ class Extracter:
     def get_axisbank_postgres_db(self) -> list[tuple]:
         self.__axisbank.execute('SELECT * FROM AXISBANK')
 
-        return [ dict(line) for line in [zip([ column[0] for column in self.__axisbank.description if column[0] != 'index'], row) for row in self.__axisbank.fetchall()] ]
+        return self.__axisbank.fetchall()
+    
