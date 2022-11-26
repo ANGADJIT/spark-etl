@@ -63,14 +63,14 @@ class Transformers:
         axisbank_stocks_df = axisbank_stocks_df.withColumn('Year',split(col('Date'),'-')[0])
         axisbank_stocks_df = axisbank_stocks_df.drop('Date')
 
+        axisbank_stocks_df = axisbank_stocks_df.filter(axisbank_stocks_df.Year >= 2007)
+
         self.__axisbank_stocks_df = axisbank_stocks_df
 
         adaniports_stocks_df = self.__adaniports_stocks_df.withColumn('Month',split(col('Date'),'-')[1])
         adaniports_stocks_df = adaniports_stocks_df.withColumn('Day',split(col('Date'),'-')[2])
         adaniports_stocks_df = adaniports_stocks_df.withColumn('Year',split(col('Date'),'-')[0])
         adaniports_stocks_df = adaniports_stocks_df.drop('Date')
-
-        adaniports_stocks_df = adaniports_stocks_df.filter(adaniports_stocks_df.Year >= 2007)
 
         self.__adaniports_stocks_df = adaniports_stocks_df
 
