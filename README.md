@@ -1,5 +1,7 @@
 # spark-basic-etl
+
 <br>
+![spark-basic-etl](https://user-images.githubusercontent.com/67195682/205505330-647445a9-34e7-4900-b4fc-a4bd2b8087ad.png)
 
 ## Workflow :)
 <dl>
@@ -15,6 +17,7 @@
 <dd>Loader is taking <b>TRANSFORMER</b> as dependency which we using to perform analytics and combining the data which we store.So here we are combining the AXISBANK and ADANIPORTS data then I am saving this data to hdfs under stocks/data and performing basic analytics the output i am ploting in graph and saving as .png in insights in HDFS.</dd>
 </dl>
 <br>
+![Month](https://user-images.githubusercontent.com/67195682/205505366-76ead99f-84d8-4391-ac1d-5fb529f4fc74.png)
 
 ## Tool used
 <ul>
