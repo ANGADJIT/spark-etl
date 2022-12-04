@@ -92,9 +92,3 @@ class Transformers:
     @property
     def spark_session(self) -> SparkSession:
         return self.__spark
-    
-
-    # desctructor 
-    def __del__(self):
-        self.__sc.stop()
-        self.__spark.stop()

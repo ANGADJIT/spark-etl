@@ -8,14 +8,19 @@ from os import mkdir, system, remove
 class Loader:
 
     def __init__(self, transformer: Transformers) -> None:
-        import matplotlib.pyplot as plt
-
-        self.__plt = plt
+        self.__plt = self.__load_plt()
         self.__transformer = transformer
+        
+        system('hdfs dfs -mkdir -p /data/stocks/insights')
 
         # temp folder logic
         if exists('assets/temp') == False:
             mkdir('assets/temp')
+    
+    def __load_plt(self):
+        import matplotlib.pyplot as plt
+
+        return plt
         
     
     def load(self) -> None:
@@ -34,34 +39,35 @@ class Loader:
     def __perform_queries(self, column: str) -> None:
 
         # QUERY1 : PLot a graph stock price comparision of AXISBANK Vs ADANIPORTS yearly
-        axisbank_yearly: DataFrame = self.__transformer.axisbank_stocks.groupBy(
+        axisbank: DataFrame = self.__transformer.axisbank_stocks.groupBy(
             column).agg(ag_max('Close').alias('price'))
-        axisbank_yearly: DataFrame = axisbank_yearly.orderBy(column)
+        axisbank: DataFrame = axisbank.orderBy(column)
 
-        adaniports_yearly: DataFrame = self.__transformer.adaniports_stocks.groupBy(
+        adaniports: DataFrame = self.__transformer.adaniports_stocks.groupBy(
             column).agg(ag_max('Close').alias('price'))
-        adaniports_yearly: DataFrame = adaniports_yearly.orderBy(column)
+        adaniports: DataFrame = adaniports.orderBy(column)
 
         # plot graph
         self.__plt.title('Axis Bank Vs Adaniports (2007-2021)')
         self.__plt.xlabel(column)
         self.__plt.ylabel('Stock Price')
         self.__plt.grid()
-        self.__plt.plot(axisbank_yearly.select(column).toPandas().Year.astype(
-            'int'), axisbank_yearly.select('price').toPandas().price.astype('float'), marker='o')
-        self.__plt.plot(adaniports_yearly.select(column).toPandas().Year.astype(
-            'int'), adaniports_yearly.select('price').toPandas().price.astype('float'), marker='D')
-
-        self.__save_graph_image_hdfs(image_name='yearly-comparision')
+        self.__plt.plot(axisbank.select(column).toPandas()[column].astype(
+            'int'), axisbank.select('price').toPandas().price.astype('float'), marker='o',label='Axisbank')
+        self.__plt.plot(adaniports.select(column).toPandas()[column].astype(
+            'int'), adaniports.select('price').toPandas().price.astype('float'), marker='D',label='Adaniports')
+        self.__plt.legend()
+        
+        self.__save_graph_image_hdfs(image_name=column)
 
     def __to_csv(self, dataframe: DataFrame, file_name: str) -> None:
         dataframe.write.csv(f'/data/stocks/data/{file_name}')
 
     def __save_graph_image_hdfs(self, image_name: str) -> None:
         self.__plt.savefig(f'assets/temp/{image_name}.png')
+        self.__plt.clf()
 
-        # upload to hdfs
-        system(
-            f'hdfs dfs -put assets/temp/{image_name}.png /data/stocks/insights')
-
+        system(f'hdfs dfs -put assets/temp/{image_name}.png /data/stocks/insights/')
         remove(f'assets/temp/{image_name}.png')
+
+

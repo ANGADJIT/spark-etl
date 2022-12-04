@@ -26,3 +26,6 @@ class Extracter:
 
         return self.__axisbank.fetchall()
     
+    def __del__(self):
+        self.__axisbank.close()
+    
